@@ -12,7 +12,7 @@ services:
     image: tradingagents-backend:v1.0.0-preview
     container_name: tradingagents-backend
     ports:
-      - "8000:8000"
+      - "8001:8000"
     volumes:
       # 日志目录映射
       - ./logs:/app/logs
@@ -40,7 +40,7 @@ services:
       API_HOST: "0.0.0.0"
       API_PORT: "8000"
       # CORS配置
-      CORS_ORIGINS: "http://localhost:3000,http://localhost:8080,http://localhost:5173"
+      CORS_ORIGINS: "http://127.0.0.1:3001,http://127.0.0.1:8081,http://127.0.0.1:5173"
     depends_on:
       mongodb:
         condition: service_healthy
@@ -49,7 +49,7 @@ services:
     networks:
       - tradingagents-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      test: ["CMD", "curl", "-f", "http://127.0.0.1:8001/api/health"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -69,18 +69,18 @@ services:
     image: tradingagents-frontend:v1.0.0-preview
     container_name: tradingagents-frontend
     ports:
-      - "3000:80"
+      - "3001:80"
     environment:
       TZ: "Asia/Shanghai"
       # 后端API地址
-      VITE_API_BASE_URL: "http://localhost:8000"
+      VITE_API_BASE_URL: "http://127.0.0.1:8001"
     depends_on:
       backend:
         condition: service_healthy
     networks:
       - tradingagents-network
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -110,7 +110,7 @@ services:
     networks:
       - tradingagents-network
     healthcheck:
-      test: echo 'db.runCommand("ping").ok' | mongo localhost:27017/test --quiet
+      test: echo 'db.runCommand("ping").ok' | mongo 127.0.0.1:27017/test --quiet
       interval: 30s
       timeout: 10s
       retries: 3
@@ -162,7 +162,7 @@ services:
       redis:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8081"]
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://127.0.0.1:8081"]
       interval: 30s
       timeout: 10s
       retries: 3
